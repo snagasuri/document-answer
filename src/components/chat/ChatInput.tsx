@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useApiClient } from '@/lib/api-client';
+import { useApiClient } from '../../lib/api-client';
 
 interface ChatInputProps {
   onSend: (message: string) => void;
