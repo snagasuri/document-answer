@@ -53,9 +53,13 @@ async function handleApiRequest(
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
     const path = pathSegments.join('/');
+    
+    // Log the incoming request path
+    console.log('Incoming request path:', path);
+    
     const url = new URL(`${backendUrl}/api/v1/chat/${path}`);
     
-    // Log the URL for debugging
+    // Log the outgoing URL
     console.log(`Forwarding ${method} request to: ${url.toString()}`);
     
     // Add query parameters

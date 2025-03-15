@@ -53,8 +53,15 @@ async function handleApiRequest(
   try {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
     const path = pathSegments.join('/');
-    const url = new URL(`${backendUrl}/api/v1/documents/${path}`);
     
+    // Log the incoming request path
+    console.log('Incoming request path:', path);
+    
+    // Handle special case for upload endpoint
+    const backendPath = path === 'upload' ? 'upload' : path;
+    const url = new URL(`${backendUrl}/api/v1/documents/${backendPath}`);
+    
+    // Log the outgoing URL
     console.log(`Forwarding ${method} request to: ${url.toString()}`);
     
     // Add query parameters

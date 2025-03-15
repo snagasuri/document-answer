@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useApiClient } from '../../lib/api-client';
+import { useApiClient } from '@/lib';
 
 interface Document {
   _id: string;

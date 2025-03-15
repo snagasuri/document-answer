@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useApiClient } from '../lib/api-client';
+import { useApiClient } from '@/lib';
 import { Message } from '@/types/chat';
 
 export function useChat(sessionId: string) {

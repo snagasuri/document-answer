@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useApiClient } from '../../lib/api-client';
+import { useApiClient } from '@/lib';
 
 interface ChatSession {
   _id: string;
