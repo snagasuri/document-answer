@@ -1,0 +1,355 @@
+/* Add some color to the UI */
+.new-chat-button {
+  background-color: #0000ff !important; /* Blue */
+  color: white !important;
+  border: none !important;
+}
+
+.new-chat-button:hover {
+  background-color: #0000cc !important; /* Darker blue */
+}
+
+.create-chat-button {
+  background-color: #0000ff !important; /* Blue */
+  color: white !important;
+  border: none !important;
+}
+
+.create-chat-button:hover {
+  background-color: #0000cc !important; /* Darker blue */
+}
+
+.chat-welcome h1 {
+  color: #ff0000 !important; /* Red */
+}
+
+/* Fix layout issues */
+.chat-container {
+  display: flex !important;
+  height: 100vh !important;
+  width: 100% !important;
+}
+
+.sidebar {
+  width: 256px !important;
+  height: 100% !important;
+  border-right: 1px solid #e5e7eb !important;
+  background-color: #f9fafb !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.chat-main {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #f9fafb !important;
+}
+
+/* Fix chat list */
+.chat-list {
+  flex: 1 !important;
+  overflow-y: auto !important;
+}
+
+.chat-list-item {
+  position: relative !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.chat-list-item a {
+  display: block !important;
+  padding: 12px !important;
+  text-decoration: none !important;
+}
+
+.chat-list-item-title {
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #4b5563 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.chat-list-item-date {
+  font-size: 12px !important;
+  color: #9ca3af !important;
+}
+
+/* Chat Session Page Styles */
+.chat-session-container {
+  display: flex !important;
+  height: 100vh !important;
+  width: 100% !important;
+  background-color: white !important;
+}
+
+.document-panel {
+  width: 320px !important;
+  border-right: 1px solid #e5e7eb !important;
+  padding: 12px !important;
+  overflow-y: auto !important;
+  background-color: #f9fafb !important;
+}
+
+.chat-area {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+}
+
+.chat-messages {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+.chat-input-container {
+  border-top: 1px solid #e5e7eb !important;
+  padding: 12px !important;
+  background-color: white !important;
+}
+
+/* Fix chat header */
+.macos-header {
+  padding: 12px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  background-color: white !important;
+}
+
+/* Fix show documents button */
+button[title="show documents"], button[title="hide documents"] {
+  display: flex !important;
+  align-items: center !important;
+  padding: 6px 10px !important;
+  background-color: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  color: #4b5563 !important;
+}
+
+button[title="show documents"]:hover, button[title="hide documents"]:hover {
+  background-color: #f3f4f6 !important;
+}
+
+/* Fix context window */
+.context-window, div:has(> span:contains("context window")) {
+  margin-bottom: 12px !important;
+  font-size: 12px !important;
+  color: #6b7280 !important;
+}
+
+.context-window-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  margin-bottom: 4px !important;
+}
+
+.context-window-caption {
+  font-size: 12px !important;
+  color: #6b7280 !important;
+}
+
+.context-window-progress-bg {
+  width: 100% !important;
+  height: 4px !important;
+  background-color: #e5e7eb !important;
+  border-radius: 2px !important;
+}
+
+.context-window-progress-fill {
+  height: 4px !important;
+  background-color: #9ca3af !important;
+  border-radius: 2px !important;
+}
+
+.context-window-footer {
+  display: flex !important;
+  justify-content: space-between !important;
+  margin-top: 4px !important;
+  font-size: 12px !important;
+  color: #6b7280 !important;
+}
+
+/* Fix file upload button */
+input[type="file"], button[type="button"] {
+  padding: 6px 10px !important;
+  background-color: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  color: #4b5563 !important;
+}
+
+/* Chat input styles */
+.chat-input-form {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.chat-input-file-label {
+  cursor: pointer !important;
+  color: #6b7280 !important;
+}
+
+.chat-input-file-label:hover {
+  color: #4b5563 !important;
+}
+
+.chat-input-file-icon {
+  height: 20px !important;
+  width: 20px !important;
+}
+
+.chat-input {
+  flex: 1 !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  outline: none !important;
+}
+
+.chat-input:focus {
+  border-color: #d1d5db !important;
+  box-shadow: 0 0 0 2px rgba(209, 213, 219, 0.2) !important;
+}
+
+.chat-input:disabled {
+  background-color: #f9fafb !important;
+  cursor: not-allowed !important;
+}
+
+/* Fix chat messages */
+.chat-messages > div, .chat-messages-list > div {
+  width: 100% !important;
+  padding: 10px 0 !important;
+}
+
+/* Fix empty state messages */
+.chat-messages > div:has(> div:contains("no messages yet")),
+.chat-messages-list > div:has(> p:contains("no messages yet")) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  color: #6b7280 !important;
+  font-size: 14px !important;
+}
+
+/* Style the chat messages list */
+.chat-messages-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding: 16px !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+}
+
+/* Style user and assistant messages */
+.macos-message-user, .macos-message-assistant {
+  padding: 12px !important;
+  border-radius: 8px !important;
+  max-width: 80% !important;
+  word-break: break-word !important;
+}
+
+.macos-message-user {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+  align-self: flex-end !important;
+}
+
+.macos-message-assistant {
+  background-color: white !important;
+  border: 1px solid #e5e7eb !important;
+  color: #111827 !important;
+  align-self: flex-start !important;
+}
+
+.chat-send-button {
+  background-color: #0000ff !important; /* Blue */
+  color: white !important;
+  border: none !important;
+}
+
+.chat-send-button:hover {
+  background-color: #0000cc !important; /* Darker blue */
+}
+
+/* Fix Tailwind classes in chat session page */
+.flex {
+  display: flex !important;
+}
+
+.flex-1 {
+  flex: 1 1 0% !important;
+}
+
+.h-screen {
+  height: 100vh !important;
+}
+
+.bg-white {
+  background-color: white !important;
+}
+
+.border-r {
+  border-right-width: 1px !important;
+}
+
+.border-gray-200 {
+  border-color: #e5e7eb !important;
+}
+
+.p-3 {
+  padding: 12px !important;
+}
+
+.overflow-y-auto {
+  overflow-y: auto !important;
+}
+
+.bg-gray-50 {
+  background-color: #f9fafb !important;
+}
+
+.flex-col {
+  flex-direction: column !important;
+}
+
+.border-t {
+  border-top-width: 1px !important;
+}
+
+/* Fix user profile picture size */
+.w-7, .h-7, .user-profile-pic {
+  width: 28px !important;
+  height: 28px !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  border-radius: 6px !important;
+  border: 1px solid #e5e7eb !important;
+  object-fit: cover !important;
+}
+
+/* Fix profile picture container */
+.flex.items-center.space-x-2 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}

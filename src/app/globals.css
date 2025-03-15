@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --gray-50: #f9f9f9;
+  --gray-100: #f3f3f3;
+  --gray-200: #e9e9e9;
+  --gray-300: #d6d6d6;
+  --gray-400: #b8b8b8;
+  --gray-500: #8d8d8d;
+  --gray-600: #6e6e6e;
+  --gray-700: #4f4f4f;
+  --gray-800: #383838;
+  --gray-900: #1f1f1f;
+}
+
+/* Force light mode regardless of system preference */
+body {
+  color: #171717;
+  background: #ffffff;
+  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  text-transform: lowercase;
+}
+
+/* macOS-inspired UI styles */
+@layer components {
+  /* Buttons */
+  .macos-button {
+    @apply bg-white text-gray-700 border border-gray-200 rounded-md 
+           hover:bg-gray-50 transition-colors shadow-[0_1px_1px_rgba(0,0,0,0.03)]
+           text-sm font-light py-1.5 px-3;
+  }
+  
+  .macos-button-primary {
+    @apply bg-gray-800 text-white border border-gray-800 rounded-md 
+           hover:bg-gray-700 transition-colors shadow-[0_1px_1px_rgba(0,0,0,0.03)]
+           text-sm font-light py-1.5 px-3;
+  }
+  
+  .macos-button-secondary {
+    @apply bg-gray-100 text-gray-700 border border-gray-200 rounded-md 
+           hover:bg-gray-200 transition-colors shadow-[0_1px_1px_rgba(0,0,0,0.03)]
+           text-sm font-light py-1.5 px-3;
+  }
+  
+  /* Inputs */
+  .macos-input {
+    @apply border border-gray-300 rounded-md p-2 focus:outline-none 
+           focus:ring-1 focus:ring-gray-400 shadow-[0_1px_1px_rgba(0,0,0,0.02)]
+           text-sm;
+  }
+  
+  /* Cards and containers */
+  .macos-card {
+    @apply bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_rgba(0,0,0,0.03)];
+  }
+  
+  .macos-panel {
+    @apply bg-gray-50 border border-gray-200 rounded-md;
+  }
+  
+  /* Dividers */
+  .macos-divider {
+    @apply border-gray-200;
+  }
+  
+  /* Message bubbles */
+  .macos-message-user {
+    @apply bg-gray-100 text-gray-800 rounded-md p-3;
+  }
+  
+  .macos-message-assistant {
+    @apply bg-white border border-gray-200 text-gray-800 rounded-md p-3 shadow-[0_1px_1px_rgba(0,0,0,0.02)];
+  }
+  
+  /* Progress bars */
+  .macos-progress-bg {
+    @apply bg-gray-200 rounded-full h-1.5;
+  }
+  
+  .macos-progress-fill {
+    @apply bg-gray-500 h-1.5 rounded-full;
+  }
+  
+  /* Sidebar */
+  .macos-sidebar {
+    @apply w-64 h-full border-r border-gray-200 bg-gray-50 flex flex-col;
+  }
+  
+  /* Header */
+  .macos-header {
+    @apply border-b border-gray-200 p-3;
+  }
+  
+  /* Typography */
+  .macos-title {
+    @apply text-base font-medium text-gray-800;
+  }
+  
+  .macos-subtitle {
+    @apply text-sm font-normal text-gray-600;
+  }
+  
+  .macos-caption {
+    @apply text-xs font-light text-gray-500;
+  }
+}
+
+/* Ensure all text is lowercase */
+h1, h2, h3, h4, h5, h6, p, span, button, a, input, textarea, label, div {
+  text-transform: lowercase;
+}

@@ -1,0 +1,80 @@
+# FastAPI and Server
+fastapi==0.109.2
+uvicorn==0.27.1
+python-multipart==0.0.9
+pydantic==2.6.1
+pydantic-settings==2.1.0
+python-dotenv==1.0.1
+
+# Document Processing
+PyPDF2==3.0.1
+# unstructured==0.12.3 - Version not available, removing as it's not used in the current implementation
+spacy==3.7.2
+nltk==3.8.1
+# Add spaCy model - will be downloaded via python -m spacy download en_core_web_md
+
+# RAG Components
+sentence-transformers==2.3.1
+pinecone==6.0.1  # Updated from pinecone-client to the new Pinecone Python SDK
+rank-bm25==0.2.2
+scikit-learn==1.4.0
+numpy==1.26.3
+pandas==2.2.0
+
+# AutoRAG
+autorag==0.1.0
+
+# Reranking
+cohere>=5.0.0a9  # Updated to be compatible with autorag
+transformers==4.37.2
+torch==2.2.0
+
+# Caching and Database
+redis==5.0.1
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.25
+alembic==1.13.1
+asyncpg==0.29.0
+motor==3.3.2  # MongoDB async driver
+pymongo==4.6.1
+
+# Monitoring and Metrics
+prometheus-client==0.19.0
+grafana-api==1.0.3
+
+# Testing and Development
+pytest==8.0.0
+pytest-asyncio==0.23.5
+pytest-cov==4.1.0
+black==24.1.1
+isort==5.13.2
+mypy==1.8.0
+pylint==3.0.3
+
+# Evaluation Metrics
+evaluate==0.4.1
+rouge-score==0.1.2
+bert-score==0.3.13
+nltk==3.8.1
+
+# HTTP and Async
+httpx==0.26.0
+aiohttp==3.9.3
+websockets==12.0
+
+# Utilities
+tqdm==4.66.1
+pyyaml==6.0.1
+python-jose[cryptography]==3.3.0
+bcrypt==4.1.2
+tenacity==8.2.3
+structlog==24.1.0
+tiktoken==0.5.2  # For token counting
+PyJWT==2.8.0  # For JWT verification
+
+# Visualization
+matplotlib==3.8.2
+seaborn==0.13.2
+
+# Optional: GPU Support
+# torch-cuda==2.2.0  # Uncomment if GPU is available
