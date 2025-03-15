@@ -2,8 +2,6 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { Inter } from "next/font/google";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import "./chat.css";
-import "./test.css";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -23,8 +21,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
+      <html lang="en" className="h-full">
+        <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased min-h-full bg-white text-gray-900`}>
           {children}
         </body>
       </html>

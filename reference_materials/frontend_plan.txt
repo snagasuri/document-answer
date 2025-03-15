@@ -1,0 +1,703 @@
+# Frontend Implementation Plan for RAG Chat Application
+
+## Overview
+
+This document outlines the comprehensive plan for implementing the frontend of our RAG-based chat application. The backend has been set up with MongoDB for chat history, token counting, and context window management, along with Clerk authentication.
+
+## Current Frontend State
+
+- Basic Next.js 15 application with App Router
+- React 19 and TypeScript
+- Tailwind CSS for styling
+- No authentication or chat functionality yet
+
+## Implementation Plan
+
+### 1. Project Structure
+
+```
+src/
+├── app/
+│   ├── layout.tsx           # Root layout with Clerk provider
+│   ├── page.tsx             # Landing page
+│   ├── globals.css          # Global styles
+│   ├── auth/                # Authentication pages
+│   │   ├── sign-in/         # Sign-in page
+│   │   └── sign-up/         # Sign-up page
+│   ├── chat/                # Chat pages
+│   │   ├── page.tsx         # Chat sessions list
+│   │   └── [sessionId]/     # Individual chat session
+│   └── documents/           # Document management
+│       ├── page.tsx         # Document list
+│       └── upload/          # Document upload
+├── components/              # Reusable components
+│   ├── ui/                  # UI components
+│   ├── chat/                # Chat components
+│   ├── documents/           # Document components
+│   └── layout/              # Layout components
+├── lib/                     # Utilities and hooks
+│   ├── utils.ts             # Utility functions
+│   ├── api-client.ts        # API client
+│   └── hooks/               # Custom hooks
+│       ├── use-chat.ts      # Chat hook
+│       ├── use-documents.ts # Documents hook
+│       └── use-auth.ts      # Auth hook
+└── types/                   # TypeScript types
+    └── index.ts             # Type definitions
+```
+
+### 2. Dependencies to Add
+
+1. **Authentication & State Management**
+   - `@clerk/nextjs` - For authentication
+   - `zustand` - For state management
+
+2. **UI Components**
+   - `@radix-ui/react-*` - For accessible UI components
+   - `@headlessui/react` - For UI components
+   - `shadcn/ui` - For pre-built UI components
+   - `lucide-react` - For icons
+
+3. **Data Fetching & Forms**
+   - `@tanstack/react-query` - For data fetching and caching
+   - `react-hook-form` - For form handling
+   - `zod` - For schema validation
+
+4. **Chat & Streaming**
+   - `eventsource-parser` - For parsing SSE streams
+   - `react-markdown` - For rendering markdown in chat
+   - `highlight.js` - For code syntax highlighting
+   - `rehype-raw` - For HTML in markdown
+   - `remark-gfm` - For GitHub Flavored Markdown
+
+5. **File Handling**
+   - `react-dropzone` - For file uploads
+   - `pdf-lib` - For PDF handling
+
+### 3. Authentication Implementation
+
+1. **Clerk Integration**
+   - Update layout.tsx to include ClerkProvider
+   - Create sign-in and sign-up pages
+   - Implement middleware for protected routes
+   - Create user profile page
+
+2. **Auth Components**
+   - UserButton component for user menu
+   - SignIn and SignUp components
+   - AuthGuard component for protected routes
+
+3. **Auth Hooks**
+   - useAuth hook for authentication state
+   - useUser hook for user data
+
+### 4. Document Upload Interface
+
+1. **Document Upload Page**
+   - Create document upload form
+   - Implement drag-and-drop functionality
+   - Add file validation (type, size)
+   - Show upload progress
+   - Handle upload errors
+
+2. **Document Management**
+   - List uploaded documents
+   - Document details view
+   - Delete document functionality
+   - Document processing status
+
+3. **Document Components**
+   - DocumentUploader component
+   - DocumentList component
+   - DocumentItem component
+   - DocumentDetails component
+
+### 5. Chat Interface
+
+1. **Chat UI Components**
+   - ChatContainer component
+   - MessageList component
+   - MessageInput component
+   - Message component (user/assistant)
+   - Citations component
+   - CodeBlock component with syntax highlighting
+   - ContextWindow component for token usage visualization
+
+2. **Chat Session Management**
+   - Create new chat session
+   - List existing sessions
+   - Rename sessions
+   - Delete sessions
+   - Session sidebar
+
+3. **Streaming Implementation**
+   - Connect to streaming endpoint
+   - Parse SSE events
+   - Update UI in real-time
+   - Handle errors and reconnection
+   - Show typing indicator
+
+4. **Context Window Visualization**
+   - Token counter component
+   - Progress bar for context window usage
+   - Visual indicators for approaching limits
+   - Token usage breakdown (prompt/completion)
+   - Cost estimation
+
+### 6. API Integration
+
+1. **API Client**
+   - Create API client for backend communication
+   - Implement authentication header injection
+   - Handle error responses
+   - Implement retry logic
+
+2. **Chat API**
+   - Create chat session
+   - Get chat sessions
+   - Get chat messages
+   - Send message and stream response
+   - Get token usage
+
+3. **Document API**
+   - Upload document
+   - List documents
+   - Get document details
+   - Delete document
+
+### 7. State Management
+
+1. **Global State**
+   - User state
+   - Current chat session
+   - Documents list
+   - UI state (sidebar open/closed, theme)
+
+2. **Local State**
+   - Chat messages
+   - Input value
+   - Loading states
+   - Error states
+
+3. **Zustand Stores**
+   - chatStore for chat state
+   - documentStore for document state
+   - uiStore for UI state
+
+### 8. Responsive Design
+
+1. **Layout Components**
+   - Sidebar (collapsible on mobile)
+   - Main content area
+   - Header with navigation
+   - Mobile navigation
+
+2. **Responsive Patterns**
+   - Mobile-first approach
+   - Breakpoints for different screen sizes
+   - Touch-friendly interactions
+   - Responsive typography
+
+3. **Accessibility**
+   - Keyboard navigation
+   - Screen reader support
+   - Color contrast compliance
+   - Focus management
+
+### 9. Performance Optimization
+
+1. **Code Splitting**
+   - Route-based code splitting
+   - Component lazy loading
+   - Dynamic imports
+
+2. **Memoization**
+   - Memoize expensive computations
+   - Use React.memo for pure components
+   - Use useMemo and useCallback hooks
+
+3. **Asset Optimization**
+   - Image optimization with next/image
+   - Font optimization
+   - SVG optimization
+
+### 10. Implementation Order
+
+1. **Phase 1: Foundation**
+   - Set up project structure
+   - Add dependencies
+   - Implement authentication
+   - Create basic layout
+
+2. **Phase 2: Core Features**
+   - Implement document upload
+   - Create chat interface
+   - Implement session management
+   - Connect to backend API
+
+3. **Phase 3: Enhanced Features**
+   - Add streaming support
+   - Implement context window visualization
+   - Add citations and markdown rendering
+   - Optimize for performance
+
+4. **Phase 4: Polish**
+   - Improve responsive design
+   - Add animations and transitions
+   - Implement error handling
+   - Add loading states
+
+## Key Components Implementation
+
+### 1. Layout Component
+
+```tsx
+// src/app/layout.tsx
+import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <ClerkProvider>
+      <html lang="en">
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <header className="flex justify-end items-center p-4 gap-4 h-16">
+            <SignedOut>
+              <SignInButton />
+              <SignUpButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </header>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
+  );
+}
+```
+
+### 2. Chat Page Component
+
+```tsx
+// src/app/chat/[sessionId]/page.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
+import { ChatList } from '@/components/chat/ChatList';
+import { ChatInput } from '@/components/chat/ChatInput';
+import { ChatHeader } from '@/components/chat/ChatHeader';
+import { ContextWindow } from '@/components/chat/ContextWindow';
+import { useChat } from '@/lib/hooks/use-chat';
+
+export default function ChatPage() {
+  const { sessionId } = useParams();
+  const { user } = useUser();
+  const { 
+    messages, 
+    sendMessage, 
+    isLoading, 
+    tokenUsage,
+    contextWindow
+  } = useChat(sessionId as string);
+
+  return (
+    <div className="flex flex-col h-screen">
+      <ChatHeader sessionId={sessionId as string} />
+      <div className="flex-1 overflow-hidden">
+        <ChatList messages={messages} isLoading={isLoading} />
+      </div>
+      <div className="border-t border-gray-200 p-4">
+        <ContextWindow 
+          usedTokens={contextWindow?.usedTokens || 0}
+          maxTokens={contextWindow?.maxTokens || 100000}
+          promptTokens={tokenUsage?.promptTokens || 0}
+          completionTokens={tokenUsage?.completionTokens || 0}
+        />
+        <ChatInput onSend={sendMessage} isLoading={isLoading} />
+      </div>
+    </div>
+  );
+}
+```
+
+### 3. Context Window Component
+
+```tsx
+// src/components/chat/ContextWindow.tsx
+'use client';
+
+import { useMemo } from 'react';
+import { Progress } from '@/components/ui/progress';
+
+interface ContextWindowProps {
+  usedTokens: number;
+  maxTokens: number;
+  promptTokens: number;
+  completionTokens: number;
+}
+
+export function ContextWindow({ 
+  usedTokens, 
+  maxTokens, 
+  promptTokens, 
+  completionTokens 
+}: ContextWindowProps) {
+  const percentUsed = useMemo(() => 
+    Math.min(100, Math.round((usedTokens / maxTokens) * 100)), 
+    [usedTokens, maxTokens]
+  );
+  
+  const remainingTokens = maxTokens - usedTokens;
+  
+  return (
+    <div className="mb-4 text-sm">
+      <div className="flex justify-between mb-1">
+        <span>Context Window: {usedTokens.toLocaleString()} / {maxTokens.toLocaleString()} tokens</span>
+        <span>{remainingTokens.toLocaleString()} remaining</span>
+      </div>
+      <Progress value={percentUsed} className="h-2" />
+      <div className="flex justify-between mt-1 text-xs text-gray-500">
+        <span>↑ {promptTokens.toLocaleString()} input tokens</span>
+        <span>↓ {completionTokens.toLocaleString()} output tokens</span>
+      </div>
+    </div>
+  );
+}
+```
+
+### 4. Chat Hook
+
+```typescript
+// src/lib/hooks/use-chat.ts
+import { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
+import { parseSSE } from '@/lib/utils';
+import { apiClient } from '@/lib/api-client';
+
+export function useChat(sessionId: string) {
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [tokenUsage, setTokenUsage] = useState(null);
+  const [contextWindow, setContextWindow] = useState(null);
+  const { user } = useUser();
+  const router = useRouter();
+  
+  // Load messages
+  useEffect(() => {
+    if (!sessionId || !user) return;
+    
+    const fetchMessages = async () => {
+      try {
+        const response = await apiClient.get(`/api/v1/chat/sessions/${sessionId}/messages`);
+        setMessages(response.data);
+      } catch (error) {
+        console.error('Failed to fetch messages:', error);
+      }
+    };
+    
+    fetchMessages();
+  }, [sessionId, user]);
+  
+  // Send message function
+  const sendMessage = useCallback(async (content: string) => {
+    if (!content.trim() || !sessionId || !user) return;
+    
+    setIsLoading(true);
+    
+    try {
+      // Add user message to UI immediately
+      const userMessage = {
+        role: 'user',
+        content,
+        createdAt: new Date().toISOString()
+      };
+      
+      setMessages(prev => [...prev, userMessage]);
+      
+      // Create placeholder for assistant message
+      const assistantPlaceholder = {
+        role: 'assistant',
+        content: '',
+        createdAt: new Date().toISOString()
+      };
+      
+      setMessages(prev => [...prev, assistantPlaceholder]);
+      
+      // Stream response
+      const response = await fetch(`/api/v1/chat/sessions/${sessionId}/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ query: content })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+      
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      
+      let assistantMessage = '';
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) {
+          break;
+        }
+        
+        const chunk = decoder.decode(value);
+        const events = parseSSE(chunk);
+        
+        for (const event of events) {
+          if (event === '[DONE]') continue;
+          
+          try {
+            const data = JSON.parse(event);
+            
+            assistantMessage = data.message;
+            
+            // Update assistant message in real-time
+            setMessages(prev => {
+              const newMessages = [...prev];
+              const lastIndex = newMessages.length - 1;
+              
+              if (lastIndex >= 0 && newMessages[lastIndex].role === 'assistant') {
+                newMessages[lastIndex] = {
+                  ...newMessages[lastIndex],
+                  content: assistantMessage
+                };
+              }
+              
+              return newMessages;
+            });
+            
+            // Update token usage and context window
+            if (data.token_usage) {
+              setTokenUsage(data.token_usage);
+            }
+            
+            if (data.context_window) {
+              setContextWindow(data.context_window);
+            }
+          } catch (error) {
+            console.error('Error parsing SSE event:', error);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [sessionId, user]);
+  
+  return {
+    messages,
+    sendMessage,
+    isLoading,
+    tokenUsage,
+    contextWindow
+  };
+}
+```
+
+### 5. Document Upload Component
+
+```tsx
+// src/components/documents/DocumentUploader.tsx
+'use client';
+
+import { useCallback, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { Upload, File, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { apiClient } from '@/lib/api-client';
+
+export function DocumentUploader() {
+  const [files, setFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState('');
+  
+  const onDrop = useCallback(acceptedFiles => {
+    setFiles(acceptedFiles);
+    setError('');
+  }, []);
+  
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'application/pdf': ['.pdf'],
+    },
+    maxSize: 50 * 1024 * 1024, // 50MB
+    maxFiles: 1,
+  });
+  
+  const uploadFile = async () => {
+    if (!files.length) return;
+    
+    setUploading(true);
+    setProgress(0);
+    setError('');
+    
+    const formData = new FormData();
+    formData.append('file', files[0]);
+    
+    try {
+      await apiClient.post('/api/v1/documents', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setProgress(percentCompleted);
+        },
+      });
+      
+      setFiles([]);
+      setProgress(100);
+      
+      // Redirect to documents list after successful upload
+      setTimeout(() => {
+        window.location.href = '/documents';
+      }, 1000);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      setError('Upload failed. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+  
+  const removeFile = () => {
+    setFiles([]);
+    setProgress(0);
+    setError('');
+  };
+  
+  return (
+    <div className="w-full max-w-md mx-auto">
+      <div
+        {...getRootProps()}
+        className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+          isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+        }`}
+      >
+        <input {...getInputProps()} />
+        <Upload className="mx-auto h-12 w-12 text-gray-400" />
+        <p className="mt-2 text-sm text-gray-600">
+          Drag & drop a PDF file here, or click to select
+        </p>
+        <p className="text-xs text-gray-500 mt-1">
+          PDF only, up to 50MB
+        </p>
+      </div>
+      
+      {files.length > 0 && (
+        <div className="mt-4 p-4 border rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <File className="h-5 w-5 text-blue-500 mr-2" />
+              <span className="text-sm truncate max-w-[200px]">
+                {files[0].name}
+              </span>
+            </div>
+            <button
+              onClick={removeFile}
+              className="text-gray-500 hover:text-red-500"
+              disabled={uploading}
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          
+          {uploading && (
+            <div className="mt-2">
+              <Progress value={progress} className="h-2" />
+              <p className="text-xs text-gray-500 mt-1">
+                Uploading: {progress}%
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {error && (
+        <p className="mt-2 text-sm text-red-500">{error}</p>
+      )}
+      
+      <Button
+        onClick={uploadFile}
+        disabled={!files.length || uploading}
+        className="mt-4 w-full"
+      >
+        {uploading ? 'Uploading...' : 'Upload Document'}
+      </Button>
+    </div>
+  );
+}
+```
+
+## Testing Strategy
+
+1. **Unit Tests**
+   - Test individual components
+   - Test hooks and utilities
+   - Test state management
+
+2. **Integration Tests**
+   - Test component interactions
+   - Test API integration
+   - Test authentication flow
+
+3. **End-to-End Tests**
+   - Test user flows
+   - Test authentication
+   - Test chat functionality
+   - Test document upload
+
+## Deployment Strategy
+
+1. **Development Environment**
+   - Local development with Next.js dev server
+   - Mock API responses for faster development
+
+2. **Staging Environment**
+   - Deploy to Vercel preview environments
+   - Connect to staging backend API
+   - Test with real data
+
+3. **Production Environment**
+   - Deploy to Vercel production
+   - Connect to production backend API
+   - Monitor performance and errors
+
+## Conclusion
+
+This frontend implementation plan provides a comprehensive roadmap for building a modern, responsive, and feature-rich chat interface for our RAG-based document question-answering system. By following this plan, we will create a user-friendly application that leverages the power of the backend RAG pipeline while providing a seamless user experience.

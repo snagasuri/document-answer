@@ -24,13 +24,54 @@ async def verify_clerk_jwt(
     token = credentials.credentials
     
     try:
-        # Verify JWT with Clerk's public key
-        # Note: In production, you'd fetch Clerk's JWKS and verify with that
+        # Verify JWT with Clerk's JWKS
+        import httpx
+        
+        # Fetch JWKS from Clerk
+        async with httpx.AsyncClient() as client:
+            jwks_response = await client.get('https://api.clerk.dev/v1/jwks')
+            jwks = jwks_response.json()
+            
+        # Find the key that matches the token's key ID
+        unverified_header = jwt.get_unverified_header(token)
+        key_id = unverified_header.get('kid')
+        
+        if not key_id:
+            raise HTTPException(status_code=401, detail="Invalid token: missing key ID")
+            
+        matching_key = None
+        for key in jwks['keys']:
+            if key['kid'] == key_id:
+                matching_key = key
+                break
+                
+        if not matching_key:
+            raise HTTPException(status_code=401, detail="Invalid token: key not found")
+            
+        # Convert JWK to PEM format
+        from cryptography.hazmat.primitives.asymmetric import rsa, padding
+        from cryptography.hazmat.primitives import serialization
+        import base64
+        
+        # Decode the modulus and exponent
+        n = int.from_bytes(base64.urlsafe_b64decode(matching_key['n'] + '=' * (-len(matching_key['n']) % 4)), byteorder='big')
+        e = int.from_bytes(base64.urlsafe_b64decode(matching_key['e'] + '=' * (-len(matching_key['e']) % 4)), byteorder='big')
+        
+        # Create RSA public key
+        public_key = rsa.RSAPublicNumbers(e, n).public_key()
+        
+        # Convert to PEM
+        pem = public_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+        
+        # Verify JWT
         payload = jwt.decode(
             token,
-            settings.CLERK_SECRET_KEY,
-            algorithms=["HS256"],
-            options={"verify_signature": False}  # In production, set to True with proper JWKS
+            pem,
+            algorithms=['RS256'],
+            options={"verify_aud": False}  # Clerk uses aud claim differently
         )
         
         # Extract user ID
@@ -75,12 +116,54 @@ async def verify_clerk_header(
         raise HTTPException(status_code=401, detail="Invalid authentication scheme")
         
     try:
-        # Verify JWT with Clerk's public key
+        # Verify JWT with Clerk's JWKS
+        import httpx
+        
+        # Fetch JWKS from Clerk
+        async with httpx.AsyncClient() as client:
+            jwks_response = await client.get('https://api.clerk.dev/v1/jwks')
+            jwks = jwks_response.json()
+            
+        # Find the key that matches the token's key ID
+        unverified_header = jwt.get_unverified_header(token)
+        key_id = unverified_header.get('kid')
+        
+        if not key_id:
+            raise HTTPException(status_code=401, detail="Invalid token: missing key ID")
+            
+        matching_key = None
+        for key in jwks['keys']:
+            if key['kid'] == key_id:
+                matching_key = key
+                break
+                
+        if not matching_key:
+            raise HTTPException(status_code=401, detail="Invalid token: key not found")
+            
+        # Convert JWK to PEM format
+        from cryptography.hazmat.primitives.asymmetric import rsa, padding
+        from cryptography.hazmat.primitives import serialization
+        import base64
+        
+        # Decode the modulus and exponent
+        n = int.from_bytes(base64.urlsafe_b64decode(matching_key['n'] + '=' * (-len(matching_key['n']) % 4)), byteorder='big')
+        e = int.from_bytes(base64.urlsafe_b64decode(matching_key['e'] + '=' * (-len(matching_key['e']) % 4)), byteorder='big')
+        
+        # Create RSA public key
+        public_key = rsa.RSAPublicNumbers(e, n).public_key()
+        
+        # Convert to PEM
+        pem = public_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+        
+        # Verify JWT
         payload = jwt.decode(
             token,
-            settings.CLERK_SECRET_KEY,
-            algorithms=["HS256"],
-            options={"verify_signature": False}  # In production, set to True with proper JWKS
+            pem,
+            algorithms=['RS256'],
+            options={"verify_aud": False}  # Clerk uses aud claim differently
         )
         
         # Extract user ID

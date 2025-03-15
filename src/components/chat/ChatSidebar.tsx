@@ -86,8 +86,12 @@ export function ChatSidebar({ activeChatId }: ChatSidebarProps) {
   // Handle right-click on chat item
   const handleContextMenu = (e: React.MouseEvent, chatId: string) => {
     e.preventDefault();
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
     setContextMenuVisible(true);
-    setContextMenuPosition({ x: e.clientX, y: e.clientY });
+    setContextMenuPosition({ 
+      x: rect.right,
+      y: rect.top 
+    });
     setSelectedChatId(chatId);
   };
 
@@ -135,11 +139,12 @@ export function ChatSidebar({ activeChatId }: ChatSidebarProps) {
   };
 
   return (
-    <div className="sidebar">
-      <div className="sidebar-header">
+    <div className="w-64 h-full border-r border-gray-200 bg-gray-50 flex flex-col">
+      <div className="p-3">
         <button 
           onClick={handleNewChat}
-          className="new-chat-button"
+          data-testid="new-chat-button"
+          className="w-full flex items-center justify-center gap-2 p-2.5 bg-white text-gray-600 border border-gray-200 rounded-md text-sm hover:bg-gray-50 transition-colors shadow-sm"
         >
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
@@ -159,28 +164,29 @@ export function ChatSidebar({ activeChatId }: ChatSidebarProps) {
         </button>
       </div>
       
-      <div className="chat-list">
+      <div className="flex-1 overflow-y-auto">
         {isLoading ? (
-          <div className="p-3 text-center">loading chats...</div>
+          <div className="p-3 text-center text-sm text-gray-500">loading chats...</div>
         ) : error ? (
-          <div className="p-3 text-center">Failed to load chat sessions</div>
+          <div className="p-3 text-center text-sm text-gray-500">failed to load chat sessions</div>
         ) : chatSessions.length === 0 ? (
-          <div className="p-3 text-center">no chat sessions yet</div>
+          <div className="p-3 text-center text-sm text-gray-500">no chat sessions yet</div>
         ) : (
           <ul>
             {chatSessions.map(chat => (
               <li 
                 key={chat._id}
                 onContextMenu={(e) => handleContextMenu(e, chat._id)}
-                className={`chat-list-item ${chat._id === activeChatId ? 'active' : ''}`}
+                className={`relative border-b border-gray-200 hover:bg-gray-100 ${chat._id === activeChatId ? 'bg-gray-100' : ''}`}
               >
                 <Link 
                   href={`/chat/${chat._id}`}
+                  className="block p-3"
                 >
-                  <div className="chat-list-item-title">
+                  <div className="text-sm text-gray-700 truncate">
                     {chat.title || `chat ${formatDate(chat.createdAt)}`}
                   </div>
-                  <div className="chat-list-item-date">
+                  <div className="text-xs text-gray-500 mt-1">
                     {new Date(chat.updatedAt).toLocaleString()}
                   </div>
                 </Link>
@@ -193,15 +199,16 @@ export function ChatSidebar({ activeChatId }: ChatSidebarProps) {
       {/* Context Menu */}
       {contextMenuVisible && selectedChatId && (
         <div 
-          className="fixed bg-white shadow-macos rounded-md py-1 z-50 w-48 border border-gray-200"
+          className="fixed bg-white shadow-lg rounded-md py-1 z-50 w-32 border border-gray-200"
           style={{ 
-            left: `${contextMenuPosition.x}px`, 
-            top: `${contextMenuPosition.y}px` 
+            left: `${contextMenuPosition.x + 4}px`,
+            top: `${contextMenuPosition.y}px`,
+            transform: 'translateX(-100%)'  // Position to the left of the click
           }}
         >
           <button 
             onClick={handleDeleteChat}
-            className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
+            className="w-full text-left px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
           >
             delete chat
           </button>

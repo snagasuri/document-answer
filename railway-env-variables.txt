@@ -1,0 +1,35 @@
+# Required Environment Variables for Railway Backend Deployment
+
+# MongoDB Connection (Update this with your new Railway MongoDB connection string)
+MONGODB_URI=mongodb://mongodb-username:mongodb-password@railway-mongodb-host:railway-mongodb-port/rag
+
+# Redis for Caching (Railway provides this format when you add Redis service)
+REDIS_URL=redis://default:redis-password@railway-redis-host:railway-redis-port
+
+# Pinecone for Vector Storage (Use your existing keys)
+PINECONE_API_KEY=pcsk_42gfPr_PMk216jxNZvoaS66hPYdSwVDKfuiHxJWnro84u2oSg3Dp9zsGnFXE4LjAT1ZqAA
+PINECONE_ENVIRONMENT=aped-4627-b74a
+PINECONE_INDEX=rag-index-llama
+
+# LLM API Keys (Use your existing keys)
+OPENROUTER_API_KEY=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
+COHERE_API_KEY=nX3XTbgCGBcS5EVA0ke0xDClVKEqQV1GPrncLNiq
+
+# Authentication (Use your existing keys)
+CLERK_SECRET_KEY=sk_test_RnS7uV21jNdtqTX3KytGwbpSt2vIG6CeqhWGGFcXAJ
+CLERK_PUBLISHABLE_KEY=pk_test_c3BlY2lhbC1zaGVwaGVyZC03LmNsZXJrLmFjY291bnRzLmRldiQ
+
+# CORS Settings (Include your Vercel domain)
+CORS_ORIGINS=["https://your-vercel-app-domain.vercel.app","http://localhost:3000"]
+
+# Environment Settings
+ENVIRONMENT=production
+HOST=0.0.0.0
+PORT=8000
+DEBUG=false
+
+# RAG Pipeline Settings
+VECTOR_WEIGHT=0.7
+BM25_WEIGHT=0.2
+TFIDF_WEIGHT=0.1
+CACHE_TTL=3600

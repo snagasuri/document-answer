@@ -46,25 +46,46 @@ class LLMService:
         """Build the system prompt for the conversation"""
         return """You are a helpful AI assistant with access to document knowledge. 
         
-        IMPORTANT: Thoroughly read ALL provided context before answering. Even if information seems missing at first glance, 
-        carefully examine each source completely as relevant information may be present.
+        IMPORTANT: Thoroughly read ALL provided context before answering. Each source is clearly marked with:
+        ===== SOURCE X BEGINS =====
+        [content]
+        ===== SOURCE X ENDS =====
         
-        ALWAYS cite your sources using inline citations like [Source 1] when you use information from the context.
-        For example: "According to the document, machine learning models can overfit when they learn noise in the training data [Source 2]."
+        CRITICAL CITATION RULES:
+        1. You MUST use the exact source numbers from the section markers
+        2. NEVER cite a source number that doesn't exist in the context
+        3. Only use source numbers that appear in the markers (e.g. if there are 2 sources, only use [Source 1] and [Source 2])
+        4. Every factual statement must include a citation
         
-        If multiple sources support a statement, cite all of them: [Source 1][Source 3]
+        Example citation: "According to the document, machine learning models can overfit when they learn noise in the training data [Source 2]."
+        
+        For multiple sources: "This approach improved efficiency [Source 1] while maintaining accuracy [Source 2]"
         
         Never state that information is not available if it appears in any context source.
         If the context does contain relevant information, summarize it comprehensively with appropriate citations.
         
         If you're unsure or the context truly doesn't contain the answer, say so clearly.
-        Keep responses clear and well-structured.
-        
-        IMPORTANT: Every factual statement must include a citation to the relevant source(s)."""
+        Keep responses clear and well-structured."""
         
     def _build_context_prompt(self, results: List[SearchResult]) -> str:
         """Build context prompt from search results"""
         try:
+            # First, group chunks by document ID
+            doc_groups = {}
+            for idx, r in enumerate(results):
+                doc_id = str(r.chunk.document_id)  # Convert UUID to string for dict key
+                if doc_id not in doc_groups:
+                    doc_groups[doc_id] = {
+                        'index': len(doc_groups) + 1,  # Source number (1-based)
+                        'chunks': []
+                    }
+                doc_groups[doc_id]['chunks'].append(r)
+            
+            # Log document grouping for debugging
+            logger.info(f"Grouped {len(results)} chunks into {len(doc_groups)} documents")
+            for doc_id, group in doc_groups.items():
+                logger.info(f"Document {doc_id}: Source {group['index']} with {len(group['chunks'])} chunks")
+            
             context_parts = []
             for i, result in enumerate(results, 1):
                 logger.info(f"Processing result {i}")
@@ -109,16 +130,34 @@ class LLMService:
                 except Exception as e:
                     logger.error(f"Error adding metadata: {e}")
                     metadata = ""
-                
+
                 # Format the context with clear section markers to help LLM parse content
                 try:
                     logger.info(f"Formatting context for result {i}")
-                    context = f"\n===== SOURCE {i} BEGINS =====\n"
-                    context += f"RELEVANCE: {score_info}\n"
-                    if metadata:
-                        context += f"METADATA: {metadata}\n"
-                    context += f"CONTENT:\n{result.chunk.content}\n"
-                    context += f"===== SOURCE {i} ENDS =====\n"
+                    
+                    # Get source index from document groups
+                    doc_id = str(result.chunk.document_id)
+                    source_index = doc_groups[doc_id]['index']
+                    
+                    # Set citation_index based on source document
+                    result.chunk.metadata['citation_index'] = source_index
+                    result.chunk.citation_index = source_index
+                    
+                    # Only show source marker for first chunk of each document
+                    if result == doc_groups[doc_id]['chunks'][0]:
+                        context = f"\n===== SOURCE {source_index} BEGINS =====\n"
+                        context += f"RELEVANCE: {score_info}\n"
+                        if metadata:
+                            context += f"METADATA: {metadata}\n"
+                        context += f"CONTENT:\n"
+                    
+                    # Add chunk content
+                    context += f"{result.chunk.content}\n"
+                    
+                    # Close source marker for last chunk of document
+                    if result == doc_groups[doc_id]['chunks'][-1]:
+                        context += f"===== SOURCE {source_index} ENDS =====\n"
+                    
                     context_parts.append(context)
                 except Exception as e:
                     logger.error(f"Error formatting context: {e}")
@@ -165,8 +204,10 @@ class LLMService:
             
             # Add instructions for citation
             citation_instructions = """
-            Remember to cite your sources using [Source X] notation. 
-            Every piece of information from the context should have a citation.
+            IMPORTANT: When citing sources, you must use the exact source number from the section markers.
+            For example, if you use information from the section marked "SOURCE 2", cite it as [Source 2].
+            Do not make up source numbers or use numbers that don't match the source markers.
+            Every piece of information from the context must have a citation.
             If you're unsure about something, indicate that clearly rather than guessing.
             """
             
@@ -300,21 +341,31 @@ class LLMService:
                                 # Extract citations from the full response
                                 cited_sources = self._extract_citations(full_response)
                                 
-                                # Get the cited source chunks, including placeholders for missing sources
+                                # Group results by document ID first
+                                doc_groups = {}
+                                for idx, r in enumerate(results):
+                                    doc_id = str(r.chunk.document_id)
+                                    if doc_id not in doc_groups:
+                                        doc_groups[doc_id] = {
+                                            'index': len(doc_groups) + 1,
+                                            'chunks': []
+                                        }
+                                    doc_groups[doc_id]['chunks'].append(r)
+
+                                # Get the cited source chunks using document groups
                                 sources = []
                                 for i in cited_sources:
-                                    if 0 < i <= len(results):
-                                        # Source exists in results
-                                        sources.append(results[i-1].chunk)
+                                    # Find document group with this index
+                                    doc_group = next(
+                                        (group for group in doc_groups.values() if group['index'] == i),
+                                        None
+                                    )
+                                    if doc_group:
+                                        # Add first chunk from document as source
+                                        sources.append(doc_group['chunks'][0].chunk)
                                     else:
-                                        # Source doesn't exist, create a placeholder
-                                        logger.warning(f"Citation [Source {i}] refers to a non-existent source (only {len(results)} sources available)")
-                                        placeholder = DocumentChunk(
-                                            id=f"placeholder-source-{i}",
-                                            content=f"Source {i} content not available (citation refers to a source beyond the {len(results)} sources provided to the LLM)",
-                                            metadata={"placeholder": True, "missing_source_index": i}
-                                        )
-                                        sources.append(placeholder)
+                                        # Log warning for invalid citation
+                                        logger.warning(f"LLM cited non-existent source: [Source {i}] (only {len(doc_groups)} sources available)")
                                 
                                 # Convert UUID objects to strings for JSON serialization
                                 for source in sources:
@@ -353,21 +404,31 @@ class LLMService:
                                     # Extract citations
                                     cited_sources = self._extract_citations(full_response)
                                     
-                                    # Get the cited source chunks, including placeholders for missing sources
+                                    # Group results by document ID first
+                                    doc_groups = {}
+                                    for idx, r in enumerate(results):
+                                        doc_id = str(r.chunk.document_id)
+                                        if doc_id not in doc_groups:
+                                            doc_groups[doc_id] = {
+                                                'index': len(doc_groups) + 1,
+                                                'chunks': []
+                                            }
+                                        doc_groups[doc_id]['chunks'].append(r)
+
+                                    # Get the cited source chunks using document groups
                                     sources = []
                                     for i in cited_sources:
-                                        if 0 < i <= len(results):
-                                            # Source exists in results
-                                            sources.append(results[i-1].chunk)
+                                        # Find document group with this index
+                                        doc_group = next(
+                                            (group for group in doc_groups.values() if group['index'] == i),
+                                            None
+                                        )
+                                        if doc_group:
+                                            # Add first chunk from document as source
+                                            sources.append(doc_group['chunks'][0].chunk)
                                         else:
-                                            # Source doesn't exist, create a placeholder
-                                            logger.warning(f"Citation [Source {i}] refers to a non-existent source (only {len(results)} sources available)")
-                                            placeholder = DocumentChunk(
-                                                id=f"placeholder-source-{i}",
-                                                content=f"Source {i} content not available (citation refers to a source beyond the {len(results)} sources provided to the LLM)",
-                                                metadata={"placeholder": True, "missing_source_index": i}
-                                            )
-                                            sources.append(placeholder)
+                                            # Log warning for invalid citation
+                                            logger.warning(f"LLM cited non-existent source: [Source {i}] (only {len(doc_groups)} sources available)")
                                     
                                     # Convert UUID objects to strings for JSON serialization
                                     for source in sources:
@@ -399,22 +460,31 @@ class LLMService:
                             # Extract citations from the current buffer to provide sources during streaming
                             current_citations = self._extract_citations(buffer)
                             
-                            # Get the cited source chunks for the current buffer
-                            # Include placeholder sources for citations that don't exist in results
+                            # Group results by document ID first
+                            doc_groups = {}
+                            for idx, r in enumerate(results):
+                                doc_id = str(r.chunk.document_id)
+                                if doc_id not in doc_groups:
+                                    doc_groups[doc_id] = {
+                                        'index': len(doc_groups) + 1,
+                                        'chunks': []
+                                    }
+                                doc_groups[doc_id]['chunks'].append(r)
+
+                            # Get the cited source chunks using document groups
                             current_sources = []
                             for i in current_citations:
-                                if 0 < i <= len(results):
-                                    # Source exists in results
-                                    current_sources.append(results[i-1].chunk)
+                                # Find document group with this index
+                                doc_group = next(
+                                    (group for group in doc_groups.values() if group['index'] == i),
+                                    None
+                                )
+                                if doc_group:
+                                    # Add first chunk from document as source
+                                    current_sources.append(doc_group['chunks'][0].chunk)
                                 else:
-                                    # Source doesn't exist, create a placeholder
-                                    logger.warning(f"Citation [Source {i}] refers to a non-existent source (only {len(results)} sources available)")
-                                    placeholder = DocumentChunk(
-                                        id=f"placeholder-source-{i}",
-                                        content=f"Source {i} content not available (citation refers to a source beyond the {len(results)} sources provided to the LLM)",
-                                        metadata={"placeholder": True, "missing_source_index": i}
-                                    )
-                                    current_sources.append(placeholder)
+                                    # Log warning for invalid citation
+                                    logger.warning(f"LLM cited non-existent source: [Source {i}] (only {len(doc_groups)} sources available)")
                             
                             # Convert UUID objects to strings for JSON serialization
                             for source in current_sources:
@@ -489,21 +559,31 @@ class LLMService:
                     message = cached_data.get("message", "")
                     source_ids = cached_data.get("source_ids", [])
                     
-                    # Get source chunks, including placeholders for missing sources
+                    # Group results by document ID first
+                    doc_groups = {}
+                    for idx, r in enumerate(results):
+                        doc_id = str(r.chunk.document_id)
+                        if doc_id not in doc_groups:
+                            doc_groups[doc_id] = {
+                                'index': len(doc_groups) + 1,
+                                'chunks': []
+                            }
+                        doc_groups[doc_id]['chunks'].append(r)
+
+                    # Get source chunks using document groups
                     sources = []
                     for i in source_ids:
-                        if 0 < i <= len(results):
-                            # Source exists in results
-                            sources.append(results[i-1].chunk)
+                        # Find document group with this index
+                        doc_group = next(
+                            (group for group in doc_groups.values() if group['index'] == i),
+                            None
+                        )
+                        if doc_group:
+                            # Add first chunk from document as source
+                            sources.append(doc_group['chunks'][0].chunk)
                         else:
-                            # Source doesn't exist, create a placeholder
-                            logger.warning(f"Citation [Source {i}] refers to a non-existent source (only {len(results)} sources available)")
-                            placeholder = DocumentChunk(
-                                id=f"placeholder-source-{i}",
-                                content=f"Source {i} content not available (citation refers to a source beyond the {len(results)} sources provided to the LLM)",
-                                metadata={"placeholder": True, "missing_source_index": i}
-                            )
-                            sources.append(placeholder)
+                            # Log warning for invalid citation
+                            logger.warning(f"LLM cited non-existent source: [Source {i}] (only {len(doc_groups)} sources available)")
                     
                     # Return cached response
                     yield ChatResponse(

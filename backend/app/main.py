@@ -80,7 +80,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS_LIST,
+    allow_origins=["https://document-answer.vercel.app", "https://document-answer-git-main-srirams-projects-511bf4da.vercel.app", *settings.CORS_ORIGINS_LIST],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -24,7 +24,7 @@ class Settings(BaseSettings):
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
     
     # MongoDB
-    MONGODB_URI: str = "mongodb+srv://ramnag2003:QnsLyJvMohgPexIF@cluster0.wsbsm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    MONGODB_URI: str
     MONGODB_DB: str = "rag"
     
     # Redis

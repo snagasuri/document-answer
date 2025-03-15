@@ -1,0 +1,56 @@
+# Development files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+ENV/
+
+# Test files
+tests/
+test_*.py
+*_test.py
+pytest.ini
+
+# Documentation
+*.md
+docs/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Cache
+.cache/
+.pytest_cache/
+
+# Virtual environments
+rag-env/
+venv311/
+
+# Scripts and tools
+scripts/test_*
+scripts/debug_*
+scripts/benchmark_*
+scripts/evaluate_*
+scripts/monitor_*
+scripts/verify_*
+
+# Test data
+test_data/
+*.parquet

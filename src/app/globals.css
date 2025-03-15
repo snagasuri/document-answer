@@ -107,9 +107,34 @@ body {
   .macos-caption {
     @apply text-xs font-light text-gray-500;
   }
+
+  /* Chat components */
+  .chat-input-form {
+    @apply flex items-center gap-2 p-4 border-t border-gray-200 bg-white;
+  }
+
+  .chat-input-file-label {
+    @apply flex items-center justify-center w-10 h-10 rounded-full 
+           hover:bg-gray-100 cursor-pointer transition-colors;
+  }
+
+  .chat-input-file-icon {
+    @apply h-5 w-5 text-gray-500;
+  }
+
+  .chat-messages-list {
+    @apply flex-1 overflow-y-auto p-4 space-y-4;
+  }
 }
 
 /* Ensure all text is lowercase */
 h1, h2, h3, h4, h5, h6, p, span, button, a, input, textarea, label, div {
   text-transform: lowercase;
+}
+
+/* Add space at bottom of chat */
+.chat-messages-list::after {
+  content: "";
+  display: block;
+  height: 20px;
 }

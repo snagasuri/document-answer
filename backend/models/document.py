@@ -21,6 +21,17 @@ class DocumentChunk(BaseModel):
     bm25_tokens: Optional[List[str]] = None
     tfidf_vector: Optional[List[float]] = None
     chunk_index: int
+    citation_index: Optional[int] = None  # Explicit field for citation index
+    
+    def dict(self, *args, **kwargs):
+        """Override dict serialization to ensure metadata has citation_index"""
+        d = super().dict(*args, **kwargs)
+        # If citation_index is set, ensure it's in metadata
+        if d.get('citation_index') is not None:
+            if 'metadata' not in d:
+                d['metadata'] = {}
+            d['metadata']['citation_index'] = d['citation_index']
+        return d
     
 class SearchResult(BaseModel):
     """Search result with relevance scores"""

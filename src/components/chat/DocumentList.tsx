@@ -89,18 +89,18 @@ export default function DocumentList({ sessionId, onDeleteDocument, onProcessing
 
   if (isLoading) {
     return (
-      <div className="p-3 macos-card mb-3">
-        <h3 className="macos-title mb-2">documents</h3>
-        <p className="macos-caption">loading documents...</p>
+      <div className="p-3 bg-white border border-gray-200 rounded-md shadow-sm mb-3">
+        <h3 className="text-sm font-medium text-gray-800 mb-2">documents</h3>
+        <p className="text-xs text-gray-500">loading documents...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-3 macos-card mb-3">
-        <h3 className="macos-title mb-2">documents</h3>
-        <div className="p-2 bg-gray-100 text-gray-700 rounded-md">
+      <div className="p-3 bg-white border border-gray-200 rounded-md shadow-sm mb-3">
+        <h3 className="text-sm font-medium text-gray-800 mb-2">documents</h3>
+        <div className="p-2 bg-gray-50 text-gray-700 rounded-md text-sm">
           {error}
         </div>
       </div>
@@ -108,33 +108,33 @@ export default function DocumentList({ sessionId, onDeleteDocument, onProcessing
   }
 
   return (
-    <div className="p-3 macos-card mb-3">
-      <h3 className="macos-title mb-2">documents</h3>
+    <div className="p-3 bg-white border border-gray-200 rounded-md shadow-sm mb-3">
+      <h3 className="text-sm font-medium text-gray-800 mb-2">documents</h3>
       
       {documents.length === 0 ? (
-        <p className="macos-caption">
-          no documents uploaded yet. upload a document to start chatting with it.
-        </p>
+          <p className="text-xs text-gray-500">
+            no documents uploaded yet.
+          </p>
       ) : (
         <ul className="divide-y divide-gray-200">
           {documents.map((doc) => (
             <li key={doc._id} className="py-2">
               <div className="flex justify-between">
               <div>
-                <h4 className="macos-subtitle">{doc.filename}</h4>
-                <p className="macos-caption">
+                <h4 className="text-sm font-medium text-gray-700">{doc.filename}</h4>
+                <p className="text-xs text-gray-500">
                   uploaded: {formatDate(doc.createdAt)}
                 </p>
                 {doc.metadata.pages && (
-                  <p className="macos-caption">
+                  <p className="text-xs text-gray-500">
                     pages: {doc.metadata.pages}
                   </p>
                 )}
                 {doc.processingStatus && (
-                  <p className={`macos-caption ${
-                    doc.processingStatus === 'complete' ? 'text-gray-700' : 
-                    doc.processingStatus === 'error' ? 'text-gray-700' : 
-                    doc.processingStatus === 'indexing_failed' ? 'text-gray-700' : 
+                  <p className={`text-xs ${
+                    doc.processingStatus === 'complete' ? 'text-blue-600' : 
+                    doc.processingStatus === 'error' ? 'text-red-600' : 
+                    doc.processingStatus === 'indexing_failed' ? 'text-red-600' : 
                     'text-gray-500'}`}>
                     status: {
                       doc.processingStatus === 'processing' ? 'processing...' : 

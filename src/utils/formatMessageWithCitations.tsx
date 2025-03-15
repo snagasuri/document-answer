@@ -31,6 +31,8 @@ export function formatMessageWithCitations(message: string, sources: any[] = [])
       contentPreview: s.content?.substring(0, 30) + '...'
     })));
   }
+
+  console.log('Safe Sources:', safeSources);
   
   // Regex to find citation patterns
   const citationPattern = /\[Source (\d+)\]/g;
@@ -42,13 +44,17 @@ export function formatMessageWithCitations(message: string, sources: any[] = [])
     citationIndices.add(parseInt(citationMatch[1]));
   }
   
+  // Determine if all provided sources share a single unique citation index.
+  const uniqueCitationIndices = new Set(safeSources.map(s => s.metadata?.citation_index).filter(x => x !== undefined));
+  const singleUniqueSource = uniqueCitationIndices.size === 1;
+  
   // Check if we have all the cited sources
   if (citationIndices.size > 0) {
     console.log('Citation indices found in message:', Array.from(citationIndices).join(', '));
     
-    // Check if we're missing any sources
+    // If multiple sources exist, warn for missing citation indices.
     const missingIndices = Array.from(citationIndices).filter(idx => 
-      !safeSources.some(s => s.metadata?.index === idx)
+      safeSources.length > 1 && !safeSources.some(s => s.metadata?.citation_index === idx)
     );
     
     if (missingIndices.length > 0) {
@@ -67,20 +73,30 @@ export function formatMessageWithCitations(message: string, sources: any[] = [])
   
   while ((match = citationPattern.exec(message)) !== null) {
     citationsFound++;
-    console.log(`Found citation: [Source ${match[1]}] at index ${match.index}`);
+    const citationText = `[Source ${match[1]}]`;
+    const citationIndex = parseInt(match[1]);
+    console.log(`Found citation: ${citationText} at index ${match.index}`, {
+      citationIndex,
+      match,
+      safeSources
+    });
     
     // Add text before citation
     if (match.index > lastIndex) {
       parts.push(message.substring(lastIndex, match.index));
     }
     
-    // Add citation component
-    const sourceIndex = parseInt(match[1]);
+    // Add citation component. If only one source exists, override any citation number to 1.
+    const parsedIndex = parseInt(match[1]);
+    // Determine if all provided sources share a single unique citation index.
+    const uniqueCitationIndices = new Set(safeSources.map(s => s.metadata?.citation_index).filter(x => x !== undefined));
+    const singleUniqueSource = uniqueCitationIndices.size === 1;
+    const sourceIndex = singleUniqueSource ? 1 : parsedIndex;
     parts.push(
-      <Citation 
-        key={`citation-${match.index}`} 
-        sourceIndex={sourceIndex} 
-        sources={safeSources} 
+      <Citation
+        key={`citation-${match.index}`}
+        sourceIndex={sourceIndex}
+        sources={safeSources}
       />
     );
     

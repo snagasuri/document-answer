@@ -80,86 +80,48 @@ export function useChat(sessionId: string) {
                     setMessages(prev => {
                         const lastMessage = prev[prev.length - 1];
                         
-                        // Convert sources from API format to our Source type
-                        const newSources = data.sources ? data.sources.map((source: any, idx: number) => {
-                            console.log('Processing source:', source);
-                            // Ensure source has an id
-                            if (!source.id) {
-                                console.warn('Source missing ID, generating one');
-                            }
-                            
-                            // Extract citation index from source metadata if available
-                            let citationIndex = source.metadata?.citation_index;
-                            
-                            // If no citation index in metadata, try to extract from content
-                            if (!citationIndex && source.content) {
-                                // Look for patterns like "SOURCE 1" or "Source 2" in the content
-                                const sourceMatch = source.content.match(/source\s+(\d+)/i);
-                                if (sourceMatch) {
-                                    citationIndex = parseInt(sourceMatch[1]);
-                                }
-                            }
-                            
-                            // Create enhanced metadata with source index information
-                            const enhancedMetadata = {
-                                ...(source.metadata || {}),
-                                // Store the original array index (0-based)
-                                array_index: idx,
-                                // Store the citation index (1-based) if available, otherwise use array index + 1
-                                index: citationIndex || (idx + 1)
-                            };
-                            
-                            return {
-                                id: source.id || `source-${Date.now()}`,
-                                content: source.content || '',
-                                metadata: enhancedMetadata
-                            };
-                        }) : [];
-                        
-                        // Merge new sources with existing sources, avoiding duplicates
-                        let mergedSources = lastMessage.role === 'assistant' && lastMessage.sources 
-                            ? [...lastMessage.sources] 
-                            : [];
-                            
-                        // Add new sources that don't already exist in the merged sources
-                        if (newSources.length > 0) {
-                            newSources.forEach((newSource: any) => {
-                                // Check if this source already exists in mergedSources
-                                const existingSourceIndex = mergedSources.findIndex(
-                                    (s: any) => s.id === newSource.id
-                                );
-                                
-                                if (existingSourceIndex === -1) {
-                                    // Source doesn't exist, add it
-                                    mergedSources.push(newSource);
-                                }
-                            });
+                        interface Source {
+                          id: string;
+                          content: string;
+                          citation_index: number;
+                          metadata: {
+                            citation_index: number;
+                            [key: string]: any;
+                          };
                         }
+
+                        // Process sources with properly indexed citations
+            const newSources = data.sources ? data.sources.map((source: any, index: number): Source => {
+                // Ensure a unique source ID
+                const sourceId = source.id || `source-${Date.now()}-${Math.random()}`;
+                
+                // Get citation index from metadata or calculate from array position
+                const citationIndex = source.metadata?.citation_index || index + 1;
+                
+                // Create new metadata object with citation_index
+                const metadata = {
+                    ...(source.metadata || {}),
+                    citation_index: citationIndex
+                };
+
+                return {
+                    id: sourceId,
+                    content: source.content || '',
+                    citation_index: citationIndex,  // Set both in metadata and top level
+                    metadata
+                };
+            }) : [];
                         
-                        // Log detailed source information
-                        if (mergedSources.length > 0) {
-                            console.log('Source details:');
-                            mergedSources.forEach((source: any, index: number) => {
-                                console.log(`Source ${index + 1}:`, {
-                                    id: source.id,
-                                    contentLength: source.content?.length || 0,
-                                    metadata: source.metadata
-                                });
-                            });
-                            
-                            console.log(`Processed ${mergedSources.length} total sources`);
-                            console.log('First source preview:', mergedSources[0]?.content?.substring(0, 50) + '...');
-                        } else {
-                            console.log('No sources in this chunk');
-                            
-                            // Check if there are citations in the content but no sources
-                            const citationPattern = /\[Source (\d+)\]/g;
-                            const content = data.content || '';
-                            const matches = [...content.matchAll(citationPattern)];
-                            if (matches.length > 0) {
-                                console.log(`Warning: Found ${matches.length} citations but no sources provided`);
-                                console.log('Citations found:', matches.map(m => m[0]).join(', '));
-                            }
+                        // Update sources for message, preserving existing sources
+                        const existingSources = lastMessage?.sources || [];
+                        const sources = [...existingSources, ...newSources];
+                        
+                        // Log source processing for debugging
+                        if (sources) {
+                            console.log('Processed sources:', sources.map((s: Source) => ({
+                                id: s.id,
+                                citation_index: s.metadata.citation_index
+                            })));
                         }
                         
                         if (lastMessage.role === 'assistant') {
@@ -170,7 +132,7 @@ export function useChat(sessionId: string) {
                                 {
                                     ...lastMessage,
                                     content: lastMessage.content + (data.content || ''),
-                                    sources: mergedSources.length > 0 ? mergedSources : lastMessage.sources,
+                                    sources: lastMessage.sources ? [...lastMessage.sources, ...newSources] : newSources,
                                     // Store a flag to indicate this message is still streaming
                                     isStreaming: !data.finished
                                 }
@@ -184,7 +146,7 @@ export function useChat(sessionId: string) {
                 role: 'assistant',
                 content: data.content,
                 timestamp: new Date().toISOString(),
-                sources: newSources,
+                sources: lastMessage?.sources ? [...lastMessage.sources, ...newSources] : newSources,
                 isStreaming: !data.finished // Set initial streaming state
               }
             ];

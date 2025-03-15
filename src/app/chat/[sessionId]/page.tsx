@@ -38,19 +38,19 @@ export default function ChatSessionPage() {
   };
 
   return (
-    <div className="chat-session-container">
+    <div className="flex h-screen w-full bg-white">
       {/* Chat Sidebar */}
       <ChatSidebar activeChatId={sessionId} />
 
       <div className="flex flex-1 bg-white">
         {/* Document Panel */}
         {showDocumentPanel && (
-          <div className="document-panel">
-            <div className="document-panel-header">
-              <h2 className="document-panel-title">documents</h2>
+          <div className="w-80 border-r border-gray-200 bg-gray-50 overflow-y-auto">
+            <div className="flex justify-between items-center p-3">
+              <h2 className="text-sm font-medium text-gray-800">documents</h2>
               <button 
                 onClick={() => setShowDocumentPanel(false)}
-                className="document-panel-close"
+                className="text-gray-500 hover:text-gray-700 transition-colors"
               >
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
@@ -81,25 +81,24 @@ export default function ChatSessionPage() {
         )}
 
         {/* Chat Area */}
-        <div className="chat-area">
+        <div className="flex flex-col flex-1">
           <ChatHeader 
             sessionId={sessionId} 
             onToggleDocuments={() => setShowDocumentPanel(!showDocumentPanel)}
             showDocuments={showDocumentPanel}
           />
-          <div className="chat-messages">
+          <div className="flex-1 overflow-y-auto p-4">
             <ChatList messages={messages} isLoading={isLoading} />
           </div>
-          <div className="chat-input-container">
-            <ContextWindow 
-              usedTokens={contextWindow?.usedTokens || 0}
-              maxTokens={contextWindow?.maxTokens || 128000}
-              promptTokens={tokenUsage?.promptTokens || 0}
-              completionTokens={tokenUsage?.completionTokens || 0}
-              sources={messages.length > 0 && messages[messages.length - 1].role === 'assistant' 
-                ? messages[messages.length - 1].sources 
-                : undefined}
-            />
+          <div className="border-t border-gray-200">
+            <div className="bg-gray-50">
+              <ContextWindow 
+                usedTokens={contextWindow?.usedTokens || 0}
+                maxTokens={contextWindow?.maxTokens || 128000}
+                promptTokens={tokenUsage?.promptTokens || 0}
+                completionTokens={tokenUsage?.completionTokens || 0}
+              />
+            </div>
             <ChatInput 
               onSend={sendMessage} 
               isLoading={isLoading} 

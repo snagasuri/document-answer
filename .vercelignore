@@ -1,0 +1,57 @@
+# Python backend files
+backend/
+
+# Development files
+.git/
+node_modules/
+.next/
+.env*
+!.env.example
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/__tests__/
+coverage/
+
+# Documentation and other files
+*.md
+*.log
+*.csv
+*.pdf
+
+# Development environments
+**/venv/
+**/*.pyc
+**/__pycache__/
+.vscode/
+.idea/
+
+# Generated files
+dist/
+build/
+out/
+
+# Virtual environments
+*/env/
+*/venv/
+*/.venv/
+*/rag-env/
+Create/
+Python/
+with/
+new/
+3.11/
+a/
+
+# Docker
+Dockerfile
+docker-compose*
+
+# Test data
+test_data/
+**/test_*/
+*.test.js
+*.spec.js
